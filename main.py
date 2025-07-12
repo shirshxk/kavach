@@ -12,7 +12,8 @@ from src.utils.helpers import Helper
 from src.utils.ip_utils import IpUtils
 from src.tests.test_firewall import run_all_tests
 from colorama import Fore, Style
-import argparse
+from tqdm import tqdm
+import time
 
 class CustomArgumentParser(argparse.ArgumentParser):
     def error(self, message):
@@ -34,7 +35,7 @@ class CustomArgumentParser(argparse.ArgumentParser):
     {Fore.YELLOW}-r PORT{Style.RESET_ALL}           Remove port block rule (e.g. 22)
     {Fore.YELLOW}-p PORTS{Style.RESET_ALL}          Block ports (e.g. 22,80,443)
     {Fore.YELLOW}-l{Style.RESET_ALL}                List all rules
-    {Fore.YELLOW}-m{Style.RESET_ALL}                Show traffic stats
+    {Fore.YELLOW}-m [SECONDS]{Style.RESET_ALL}      Monitor network traffic (default: 10s)
     {Fore.YELLOW}-u{Style.RESET_ALL}                Run unit tests
     {Fore.YELLOW}-i{Style.RESET_ALL}                Show version info
     {Fore.YELLOW}-d{Style.RESET_ALL}                Delete all rules quickly
@@ -68,13 +69,6 @@ def initialize_firewall():
     logger.log("Firewall initialized", level="INFO")
 
     rule_engine = RuleEngine()
-    try:
-        if not rule_engine.rules:
-            rule_engine.load_rules()
-            logger.log("Rules loaded successfully", level="INFO")
-    except Exception as e:
-        logger.log(f"Error loading rules: {e}", level="ERROR")
-
     packet_filter = PacketFilter(rule_engine)
     return packet_filter, logger
 
@@ -104,7 +98,11 @@ def main():
     parser.add_argument("-a", "--add-rule", type=str, help="Add a firewall rule (format: IP,ACTION)")
     parser.add_argument("-r", "--remove-rule", type=str, help="Remove a firewall rule (format: IP,ACTION)")
     parser.add_argument("-l", "--list-rules", action="store_true", help="List all firewall rules")
-    parser.add_argument("-m", "--monitor-traffic", action="store_true", help="Monitor network traffic")
+    parser.add_argument(
+    "-m", "--monitor-traffic",
+    type=int, nargs="?", const=10, metavar="SECONDS",
+    help="Monitor network traffic for N seconds (default: 10)"
+    )
     parser.add_argument("-u", "--run-tests", action="store_true", help="Run unit tests for the firewall")
     parser.add_argument("-p", "--block-ports", type=str, help="Block traffic on specific ports (comma-separated, e.g., 22,80,443)")
     parser.add_argument("-d", "--reset-rules", action="store_true", help="Delete all current rules")
@@ -114,6 +112,8 @@ def main():
         print(f"{Fore.CYAN}Kavach Firewall v1.0.0{Style.RESET_ALL}")
         return
     mode = "block" if args.start else "view" if args.view_live else None
+    if mode:
+        print(f"{Fore.GREEN}[🔥] Kavach Firewall running in {mode.upper()} mode...{Style.RESET_ALL}")
 
     packet_filter, logger = initialize_firewall()
     if mode:
@@ -188,10 +188,27 @@ def main():
             print("    ➤ Remove Port rule : -r 22 or -r 22,443,8080")
 
     elif args.monitor_traffic:
-        stats = get_traffic_statistics(Helper.detect_interface())
-        print("Network Traffic Statistics:")
-        print(f"Total Packets Captured: {stats['packets']}")
-        print(f"Total Data Transferred: {stats['data']} bytes")
+        interface = Helper.detect_interface()
+        duration = args.monitor_traffic or 10
+
+        print(f"{Fore.CYAN}📡 Monitoring Network Traffic...{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}🔍 Interface Used     : {Fore.YELLOW}{interface}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}⏱️  Duration           : {Fore.YELLOW}{duration} seconds{Style.RESET_ALL}")
+        print()
+
+        for _ in tqdm(range(duration), desc="⏳ Monitoring", bar_format="{l_bar}{bar} {n_fmt}/{total_fmt}s", colour="cyan"):
+            time.sleep(1)
+
+        stats = get_traffic_statistics(interface, duration)
+        packets = stats['packets']
+        data = stats['data']
+        
+        
+        print(f"{Fore.GREEN}✅ Monitoring Complete.{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}📦 Packets Captured   : {Fore.WHITE}{packets}{Style.RESET_ALL}")
+        print(f"{Fore.MAGENTA}📊 Data Transferred   : {Fore.WHITE}{data:,} bytes{Style.RESET_ALL}")
+        print()
+
 
     elif args.run_tests:
         print("Running unit tests...")
