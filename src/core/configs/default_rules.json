@@ -1,0 +1,12 @@
+{
+    "rules": [
+        {
+            "src": "8.8.8.8",
+            "action": "BLOCK"
+        },
+        {
+            "src": "1.2.3",
+            "action": "ALLOW"
+        }
+    ]
+}

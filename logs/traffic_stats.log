@@ -1,0 +1,2 @@
+2024-12-04 18:05:01,672 - INFO - Firewall initialization started.
+2024-12-04 18:05:01,673 - ERROR - Error loading rules: RuleEngine.load_rules() takes 1 positional argument but 2 were given

@@ -1,0 +1,14 @@
+import yaml
+
+def load_settings(config_file="settings.yaml"):
+    try:
+        with open(config_file, "r") as file:
+            settings = yaml.safe_load(file)
+            return settings
+    except FileNotFoundError:
+        print(f"Configuration file '{config_file}' not found. Using defaults.")
+        return {}
+
+if __name__ == "__main__":
+    settings = load_settings()
+    print("Loaded Settings:", settings)

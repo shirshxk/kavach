@@ -1,0 +1,27 @@
+2024-12-03 19:28:25,476 - ERROR - Error loading rules: RuleEngine.load_rules() takes 1 positional argument but 2 were given
+2024-12-03 19:30:57,988 - ERROR - Error loading rules: RuleEngine.load_rules() takes 1 positional argument but 2 were given
+2024-12-03 19:32:01,377 - ERROR - Error loading rules: RuleEngine.load_rules() takes 1 positional argument but 2 were given
+2024-12-03 19:32:41,805 - ERROR - Error loading rules: RuleEngine.load_rules() takes 1 positional argument but 2 were given
+2024-12-03 19:33:15,484 - ERROR - Error loading rules: RuleEngine.load_rules() takes 1 positional argument but 2 were given
+2024-12-03 19:38:13,793 - ERROR - An error occurred
+2024-12-03 19:38:33,309 - ERROR - An error occurred
+2024-12-03 19:40:41,689 - ERROR - An error occurred
+2024-12-03 19:44:49,354 - ERROR - An error occurred
+2024-12-03 19:45:06,435 - ERROR - An error occurred
+2024-12-03 19:45:45,023 - ERROR - An error occurred
+2024-12-03 19:46:47,240 - ERROR - An error occurred
+2024-12-03 19:47:26,592 - ERROR - An error occurred
+2024-12-03 19:51:06,383 - ERROR - An error occurred
+2024-12-03 19:53:19,116 - ERROR - An error occurred
+2024-12-03 19:54:55,762 - ERROR - An error occurred
+2024-12-04 17:37:33,512 - ERROR - An error occurred
+2024-12-04 17:41:42,194 - ERROR - An error occurred
+2024-12-04 17:42:06,883 - ERROR - An error occurred
+2024-12-04 17:42:06,886 - ERROR - Test Error Message
+2024-12-04 17:45:12,272 - ERROR - An error occurred
+2024-12-04 17:45:12,276 - ERROR - Test Error Message
+2024-12-04 17:50:22,985 - ERROR - An error occurred
+2024-12-04 17:50:22,989 - ERROR - Test Error Message
+2024-12-04 17:54:13,492 - ERROR - An error occurred
+2024-12-04 17:54:13,495 - ERROR - Test Error Message
+2024-12-04 18:12:28,050 - ERROR - An error occurred

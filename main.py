@@ -1,0 +1,240 @@
+#!/usr/bin/env -S PYTHONWARNINGS=ignore python3
+import argparse
+import logging
+from src.core.packet_sniffer import PacketSniffer
+from src.core.rule_engine import RuleEngine
+from src.core.packet_filter import PacketFilter
+from src.core.logger import Logger
+from src.core.connection_tracker import ConnectionTracker
+from src.utils.traffic_monitor import get_traffic_statistics
+from src.utils.helpers import Helper
+from src.utils.ip_utils import IpUtils
+from src.tests.test_firewall import run_all_tests
+import unittest
+import json
+import psutil
+import subprocess
+
+class CustomArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        print(f"\n[❌] {message}")
+        print("\n📝 Correct Usage Examples:")
+        print("   ➤ Add Rule       :  -a 192.168.1.1,ALLOW")
+        print("   ➤ Remove Rule    :  -r 192.168.1.1,BLOCK")
+        print("   ➤ View Rules     :  -l")
+        print("   ➤ Start Firewall :  -s")
+        print("   ➤ Monitor        :  -v")
+        exit(2)
+
+def ensure_iptables():
+    try:
+        output = subprocess.check_output(["sudo", "iptables", "-L", "INPUT", "-n"])
+        if "NFQUEUE" not in output.decode():
+            print("[*] Inserting iptables rule to forward packets to NFQUEUE...")
+            subprocess.run(["sudo", "iptables", "-I", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"])
+        else:
+            print("[✓] NFQUEUE rule already active.")
+    except Exception as e:
+        print(f"[!] Failed to check or insert iptables rule: {e}")
+
+def cleanup_iptables():
+    print("[*] Cleaning up iptables rule...")
+    subprocess.call(["iptables", "-D", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"])
+
+def initialize_firewall():
+    """
+    Initializes the firewall components, including rules, sniffer, and logger.
+    """
+    print("Initializing Firewall...")
+    # Set up logging
+    logger = Logger("logs/firewall.log")
+    logger.log("Firewall initialized", level="INFO")
+    
+    # Initialize rule engine
+    rule_engine = RuleEngine()
+    try:
+        if not rule_engine.rules:  # Load rules only if not already loaded
+            rule_engine.load_rules()
+            logger.log("Rules loaded successfully", level="INFO")
+    except Exception as e:
+        logger.log(f"Error loading rules: {e}", level="ERROR")
+    
+    # Initialize packet filter and connection tracker
+    packet_filter = PacketFilter(rule_engine)  # Pass RuleEngine instance
+    connection_tracker = ConnectionTracker()
+
+    return packet_filter, logger, connection_tracker
+
+
+def add_ip_rule(ip, subnet):
+    """Example function to add a rule based on IP validation and subnet check."""
+    if IpUtils.is_valid_ip(ip):
+        if IpUtils.is_ip_in_subnet(ip, subnet):
+            print(f"IP {ip} is valid and belongs to the subnet {subnet}.")
+            # Proceed with adding the rule
+        else:
+            print(f"IP {ip} does not belong to the subnet {subnet}. Rule not added.")
+    else:
+        print(f"Invalid IP address: {ip}. Rule not added.")
+
+
+def detect_interface():
+    interfaces = psutil.net_if_addrs()
+    for iface in interfaces:
+        if iface != "lo" and not iface.startswith("docker") and not iface.startswith("veth"):
+            return iface
+    return "lo"
+
+def start_sniffer(packet_filter, logger):
+    print("Starting Packet Sniffer...")
+    sniffer = PacketSniffer(
+        interface=detect_interface(),
+        packet_filter=packet_filter,  # Pass the PacketFilter instance
+        logger=logger
+    )
+    sniffer.start()
+
+
+def main():
+    """
+    Main function to provide CLI for the firewall.
+    """
+
+    # Parse command-line arguments
+    parser = CustomArgumentParser(description="Python Firewall CLI")
+    parser.add_argument("-s", "--start", action="store_true", help="Start full firewall with packet blocking via NetfilterQueue")
+    parser.add_argument("-v", "--view-live", action="store_true", help="Live monitor firewall packets without blocking")
+    parser.add_argument("-a", "--add-rule", type=str, help="Add a firewall rule (JSON format)")
+    parser.add_argument("-r", "--remove-rule", type=str, help="Remove a firewall rule (JSON format)")
+    parser.add_argument("-l", "--list-rules", action="store_true", help="List all firewall rules")
+    parser.add_argument("-c", "--track-connections", action="store_true", help="Track active connections")
+    parser.add_argument("-m", "--monitor-traffic", action="store_true", help="Monitor network traffic")
+    parser.add_argument("-u", "--run-tests", action="store_true", help="Run unit tests for the firewall")
+    parser.add_argument("-i", "--add-ip-rule", type=str, help="Add a rule for a specific IP (format: ip,subnet)")
+
+    args = parser.parse_args()
+
+    if args.start:
+        mode = "block"
+    elif args.view_live:
+        mode = "view"
+    else:
+        mode = None 
+
+    # Now initialize the firewall **after** deciding mode
+    packet_filter, logger, connection_tracker = initialize_firewall()
+    if mode:
+        packet_filter.mode = mode
+
+    # Handle commands
+    if args.start:
+        try:
+            from netfilterqueue import NetfilterQueue
+            from scapy.all import IP
+
+            ensure_iptables()
+            print("[*] Enabling firewall hard-blocking via NetfilterQueue...")
+
+            def process_packet(pkt):
+                scapy_pkt = IP(pkt.get_payload())
+                allowed = packet_filter.filter_packet(scapy_pkt)
+                if not allowed:
+                    pkt.drop()
+                else:
+                    pkt.accept()
+
+            nfqueue = NetfilterQueue()
+            nfqueue.bind(1, process_packet)
+            nfqueue.run()
+
+        except ImportError:
+            print("[ERROR] Required modules not installed. Run: pip install NetfilterQueue scapy")
+
+        except KeyboardInterrupt:
+            print("\n[!] Firewall hard-block mode stopped by user.")
+            try:
+                nfqueue.unbind()
+            except:
+                pass
+            cleanup_iptables()
+
+    elif args.add_rule:
+        try:
+            parts = args.add_rule.split(",")
+            if len(parts) != 2:
+                raise ValueError("Invalid format. Expected: IP,ACTION")
+
+            ip, action = parts
+            if action.upper() not in ["ALLOW", "BLOCK"]:
+                raise ValueError("Action must be ALLOW or BLOCK")
+
+            if not IpUtils.is_valid_ip(ip):
+                raise ValueError("Invalid IP address")
+
+            rule = {"src": ip, "action": action.upper()}
+            packet_filter.rule_engine.add_rule(rule)
+            logger.log(f"Rule added: {rule}", level="INFO")
+            print(f"✅ Rule added: {rule}")
+
+        except Exception as e:
+            print(f"[!] Failed to add rule: {e}")
+            print("📝 Correct Format: -a 192.168.1.1,ALLOW (no spaces)")
+
+    elif args.remove_rule:
+        try:
+            parts = args.remove_rule.split(",")
+            if len(parts) != 2:
+                raise ValueError("Invalid format. Expected: IP,ACTION")
+
+            ip, action = parts
+            if action.upper() not in ["ALLOW", "BLOCK"]:
+                raise ValueError("Action must be ALLOW or BLOCK")
+
+            if not IpUtils.is_valid_ip(ip):
+                raise ValueError("Invalid IP address")
+
+            rule = {"src": ip, "action": action.upper()}
+            packet_filter.rule_engine.remove_rule(rule)
+            logger.log(f"Rule removed: {rule}", level="INFO")
+            print(f"✅ Rule removed: {rule}")
+
+        except Exception as e:
+            print(f"[!] Failed to remove rule: {e}")
+            print("📝 Correct Format: -r 192.168.1.1,BLOCK (no spaces)")
+
+    elif args.track_connections:
+        print("Active Connections:")
+        active_connections = connection_tracker.get_active_connections()
+        if active_connections:
+            for conn in active_connections:
+                print(conn)
+        else:
+            print("No active connections found.")
+    elif args.monitor_traffic:
+        stats = get_traffic_statistics(detect_interface())
+        print("Network Traffic Statistics:")
+        print(f"Total Packets Captured: {stats['packets']}")
+        print(f"Total Data Transferred: {stats['data']} bytes")
+    elif args.add_ip_rule:
+        ip, subnet = args.add_ip_rule.split(",")
+        add_ip_rule(ip, subnet)
+    elif args.run_tests:
+        print("Running unit tests...")
+        run_all_tests()
+    elif args.view_live:
+        start_sniffer(packet_filter, logger)
+    else:
+        print("\n[⚙️] No option provided. Use --help to see available commands.\n")
+        parser.print_help()
+
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except PermissionError:
+        print("\n[❌] Permission denied! Try running with sudo/admin rights.\n")
+    except KeyboardInterrupt:
+        print("\n[🛑] Firewall stopped by user.")
+    except Exception as e:
+        print(f"\n[⚠️] Unexpected error: {e}\n")
