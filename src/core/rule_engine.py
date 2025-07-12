@@ -38,14 +38,12 @@ class RuleEngine:
         self.save_rules()  # Ensure rule is saved
 
     def remove_rule(self, rule):
-        print(f"Current rules before removal: {self.rules}")  # Debugging line
         if rule in self.rules:
             self.rules.remove(rule)
+            self.save_rules()
             print(f"Removed rule: {rule}")
-            self.save_rules()  # Ensure rule is saved after removal
         else:
             print("Rule not found.")
-    
 
     def check_packet(self, packet):
         """

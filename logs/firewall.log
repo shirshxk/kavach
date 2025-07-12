@@ -583,3 +583,35 @@
 2025-07-12 13:54:35,845 - INFO - Rule removed: {'src': '1.2.3.4', 'action': 'ALLOW'}
 2025-07-12 14:21:57,236 - INFO - Firewall initialized
 2025-07-12 15:31:41,790 - INFO - Firewall initialized
+2025-07-12 15:56:56,684 - INFO - Firewall initialized
+2025-07-12 15:58:42,406 - INFO - Firewall initialized
+2025-07-12 15:59:00,569 - INFO - Firewall initialized
+2025-07-12 15:59:15,846 - INFO - Firewall initialized
+2025-07-12 15:59:27,822 - INFO - Firewall initialized
+2025-07-12 15:59:54,866 - INFO - Firewall initialized
+2025-07-12 16:00:57,540 - INFO - Firewall initialized
+2025-07-12 16:01:29,989 - INFO - Firewall initialized
+2025-07-12 16:01:42,598 - INFO - Firewall initialized
+2025-07-12 16:14:49,251 - INFO - Firewall initialized
+2025-07-12 16:14:49,251 - INFO - Port block rule added: {'port': 22, 'action': 'BLOCK'}
+2025-07-12 16:15:01,766 - INFO - Firewall initialized
+2025-07-12 16:17:23,890 - INFO - Firewall initialized
+2025-07-12 16:17:23,890 - INFO - Port block rule removed: {'port': 22, 'action': 'BLOCK'}
+2025-07-12 16:17:25,926 - INFO - Firewall initialized
+2025-07-12 16:17:25,926 - INFO - Port block rule removed: {'port': 22, 'action': 'BLOCK'}
+2025-07-12 16:17:31,827 - INFO - Firewall initialized
+2025-07-12 16:17:31,827 - INFO - Port block rule removed: {'port': 222, 'action': 'BLOCK'}
+2025-07-12 16:17:48,382 - INFO - Firewall initialized
+2025-07-12 16:17:48,382 - INFO - Port block rule added: {'port': 222, 'action': 'BLOCK'}
+2025-07-12 16:17:58,723 - INFO - Firewall initialized
+2025-07-12 16:17:58,724 - INFO - Port block rule removed: {'port': 222, 'action': 'BLOCK'}
+2025-07-12 16:22:21,913 - INFO - Firewall initialized
+2025-07-12 16:22:24,058 - INFO - Firewall initialized
+2025-07-12 16:22:32,549 - INFO - Firewall initialized
+2025-07-12 16:22:39,752 - INFO - Firewall initialized
+2025-07-12 16:22:39,753 - INFO - Port block rule added: {'port': 22, 'action': 'BLOCK'}
+2025-07-12 16:25:30,622 - INFO - Firewall initialized
+2025-07-12 16:25:38,388 - INFO - Firewall initialized
+2025-07-12 16:25:47,327 - INFO - Firewall initialized
+2025-07-12 16:25:47,333 - ERROR - Test Error Message
+2025-07-12 16:25:47,333 - INFO - Test Info Message
