@@ -1,11 +1,16 @@
 import json  
 from scapy.layers.inet import IP, TCP, UDP
+import time
+from collections import defaultdict, deque
 
 class RuleEngine:
     def __init__(self, rules_file="src/core/configs/default_rules.json"):
         self.rules_file = rules_file
         self.rules = []  # Initialize rules as a list
         self.load_rules()
+        self.rate_limit_window = 5  # seconds
+        self.rate_limit_threshold = 20  # packets
+        self.packet_history = defaultdict(lambda: deque())
 
     def load_rules(self):
         try:
@@ -58,7 +63,10 @@ class RuleEngine:
             # Check for IP layer
             if IP in packet:
                 ip_layer = packet[IP]
+                src_ip = ip_layer.src
 
+                if self.is_rate_limited(src_ip):
+                    return "BLOCK"
                 if rule.get("src") and ip_layer.src != rule["src"]:
                     continue
                 if rule.get("dst") and ip_layer.dst != rule["dst"]:
@@ -83,6 +91,23 @@ class RuleEngine:
             return rule.get("action", "ALLOW").upper()
 
         return "ALLOW"  # No rule matched means allow by default
+
+    def is_rate_limited(self, src_ip):
+        now = time.time()
+        history = self.packet_history[src_ip]
+
+        # Remove old entries
+        while history and now - history[0] > self.rate_limit_window:
+            history.popleft()
+
+        # Check if threshold exceeded
+        if len(history) >= self.rate_limit_threshold:
+            print(f"[⚠️] Rate limit exceeded for {src_ip}. Blocking packet.")
+            return True
+
+        # Otherwise record this packet
+        history.append(now)
+        return False
 
     
     def test_check_packet_allow(self):

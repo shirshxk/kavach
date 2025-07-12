@@ -48,3 +48,18 @@ class Helper:
             if not (1 <= port <= 65535):
                 raise ValueError(f"Invalid port: {port}")
         return ports
+    
+    @staticmethod
+    def is_rate_limited(self, ip):
+        now = time.time()
+        timestamps = self.packet_history[ip]
+
+        while timestamps and now - timestamps[0] > self.rate_limit_window:
+            timestamps.popleft()
+
+        timestamps.append(now)
+
+        if len(timestamps) > self.rate_limit_threshold:
+            return True
+        return False
+

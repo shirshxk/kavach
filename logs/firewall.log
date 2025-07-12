@@ -615,3 +615,50 @@
 2025-07-12 16:25:47,327 - INFO - Firewall initialized
 2025-07-12 16:25:47,333 - ERROR - Test Error Message
 2025-07-12 16:25:47,333 - INFO - Test Info Message
+2025-07-12 16:49:36,150 - INFO - Firewall initialized
+2025-07-12 16:49:36,150 - INFO - Rules loaded successfully
+2025-07-12 16:49:53,346 - INFO - Firewall initialized
+2025-07-12 16:49:53,346 - INFO - Rules loaded successfully
+2025-07-12 16:50:39,999 - INFO - Firewall initialized
+2025-07-12 16:50:39,999 - INFO - Rules loaded successfully
+2025-07-12 16:52:10,168 - INFO - Firewall initialized
+2025-07-12 16:52:10,168 - INFO - Rules loaded successfully
+2025-07-12 16:52:41,723 - INFO - Firewall initialized
+2025-07-12 16:52:41,724 - INFO - Rules loaded successfully
+2025-07-12 16:54:30,828 - INFO - Firewall initialized
+2025-07-12 16:54:30,828 - INFO - Rules loaded successfully
+2025-07-12 16:54:49,128 - INFO - Firewall initialized
+2025-07-12 16:54:49,128 - INFO - Rules loaded successfully
+2025-07-12 16:59:03,868 - INFO - Firewall initialized
+2025-07-12 16:59:03,869 - INFO - Rules loaded successfully
+2025-07-12 17:03:32,373 - INFO - Firewall initialized
+2025-07-12 17:03:32,373 - INFO - Rules loaded successfully
+2025-07-12 17:58:17,174 - INFO - Firewall initialized
+2025-07-12 17:58:17,174 - INFO - Rules loaded successfully
+2025-07-12 17:58:23,041 - INFO - Firewall initialized
+2025-07-12 17:58:23,042 - INFO - Rules loaded successfully
+2025-07-12 17:58:23,042 - INFO - Rule added: {'src': '8.8.8.8', 'action': 'BLOCK'}
+2025-07-12 17:58:44,972 - INFO - Firewall initialized
+2025-07-12 18:01:07,137 - INFO - Firewall initialized
+2025-07-12 18:01:29,956 - INFO - Firewall initialized
+2025-07-12 18:03:59,445 - INFO - Firewall initialized
+2025-07-12 18:04:04,722 - INFO - Firewall initialized
+2025-07-12 18:04:04,726 - INFO - Rule removed: {'src': '8.8.8.8', 'action': 'BLOCK'}
+2025-07-12 18:04:21,145 - INFO - Firewall initialized
+2025-07-12 18:04:21,145 - INFO - Rules loaded successfully
+2025-07-12 18:04:26,081 - INFO - Firewall initialized
+2025-07-12 18:04:26,082 - INFO - Rules loaded successfully
+2025-07-12 18:04:33,770 - INFO - Firewall initialized
+2025-07-12 18:04:33,770 - INFO - Rules loaded successfully
+2025-07-12 18:04:33,771 - INFO - Rule added: {'src': '8.8.8.8', 'action': 'BLOCK'}
+2025-07-12 18:04:50,748 - INFO - Firewall initialized
+2025-07-12 18:05:02,919 - INFO - Firewall initialized
+2025-07-12 18:08:39,925 - INFO - Firewall initialized
+2025-07-12 18:09:57,159 - INFO - Firewall initialized
+2025-07-12 18:31:48,698 - INFO - Firewall initialized
+2025-07-12 18:31:48,698 - INFO - Port block rule added: {'port': 666, 'action': 'BLOCK'}
+2025-07-12 18:31:55,329 - INFO - Firewall initialized
+2025-07-12 18:33:46,941 - INFO - Firewall initialized
+2025-07-12 18:33:51,909 - INFO - Firewall initialized
+2025-07-12 18:34:40,570 - INFO - Firewall initialized
+2025-07-12 18:34:40,570 - WARNING - All rules reset by user

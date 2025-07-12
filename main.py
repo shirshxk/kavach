@@ -7,22 +7,45 @@ from src.core.packet_sniffer import PacketSniffer
 from src.core.rule_engine import RuleEngine
 from src.core.packet_filter import PacketFilter
 from src.core.logger import Logger
-from src.core.connection_tracker import ConnectionTracker
 from src.utils.traffic_monitor import get_traffic_statistics
 from src.utils.helpers import Helper
 from src.utils.ip_utils import IpUtils
 from src.tests.test_firewall import run_all_tests
+from colorama import Fore, Style
+import argparse
 
 class CustomArgumentParser(argparse.ArgumentParser):
     def error(self, message):
-        print(f"\n[❌] {message}")
-        print("\n📝 Correct Usage Examples:")
-        print("   ➤ Add Rule       :  -a 192.168.1.1,ALLOW")
-        print("   ➤ Remove Rule    :  -r 192.168.1.1,BLOCK")
-        print("   ➤ View Rules     :  -l")
-        print("   ➤ Start Firewall :  -s")
-        print("   ➤ Monitor        :  -v")
-        exit(2)
+        print(f"{Fore.RED}[❌] {message}{Style.RESET_ALL}\n")
+        self.print_help()
+        self.exit(2)
+
+    def print_help(self):
+        print(f"""
+    {Fore.CYAN + Style.BRIGHT}Kavach Firewall CLI{Style.RESET_ALL}
+    {Fore.WHITE}Usage:{Style.RESET_ALL}
+    sudo ./main.py [option] [value]
+
+    {Fore.GREEN}Available Commands:{Style.RESET_ALL}
+    {Fore.YELLOW}-s{Style.RESET_ALL}                Start the firewall (block mode)
+    {Fore.YELLOW}-v{Style.RESET_ALL}                View live traffic (no blocking)
+    {Fore.YELLOW}-a IP,ACTION{Style.RESET_ALL}      Add rule (e.g. 192.168.1.10,BLOCK)
+    {Fore.YELLOW}-r IP,ACTION{Style.RESET_ALL}      Remove IP rule (e.g. 8.8.8.8,BLOCK)
+    {Fore.YELLOW}-r PORT{Style.RESET_ALL}           Remove port block rule (e.g. 22)
+    {Fore.YELLOW}-p PORTS{Style.RESET_ALL}          Block ports (e.g. 22,80,443)
+    {Fore.YELLOW}-l{Style.RESET_ALL}                List all rules
+    {Fore.YELLOW}-m{Style.RESET_ALL}                Show traffic stats
+    {Fore.YELLOW}-u{Style.RESET_ALL}                Run unit tests
+    {Fore.YELLOW}-i{Style.RESET_ALL}                Show version info
+    {Fore.YELLOW}-d{Style.RESET_ALL}                Delete all rules quickly
+
+
+    {Fore.MAGENTA}Examples:{Style.RESET_ALL}
+    ➤ Block Google DNS           : {Fore.CYAN}-a 8.8.8.8,BLOCK{Style.RESET_ALL}
+    ➤ Unblock Port 22            : {Fore.CYAN}-r 22{Style.RESET_ALL}
+    ➤ Start Firewall Blocking    : {Fore.CYAN}-s{Style.RESET_ALL}
+    ➤ Live View Only             : {Fore.CYAN}-v{Style.RESET_ALL}
+    """)
 
 def ensure_iptables():
     try:
@@ -53,8 +76,7 @@ def initialize_firewall():
         logger.log(f"Error loading rules: {e}", level="ERROR")
 
     packet_filter = PacketFilter(rule_engine)
-    connection_tracker = ConnectionTracker()
-    return packet_filter, logger, connection_tracker
+    return packet_filter, logger
 
 def add_ip_rule(ip, subnet):
     if IpUtils.is_valid_ip(ip):
@@ -76,6 +98,7 @@ def start_sniffer(packet_filter, logger):
 
 def main():
     parser = CustomArgumentParser(description="Kavach Firewall CLI")
+    parser.add_argument("-i", "--version", action="store_true", help="Show version and exit")
     parser.add_argument("-s", "--start", action="store_true", help="Start full firewall with packet blocking via NetfilterQueue")
     parser.add_argument("-v", "--view-live", action="store_true", help="Live monitor firewall packets without blocking")
     parser.add_argument("-a", "--add-rule", type=str, help="Add a firewall rule (format: IP,ACTION)")
@@ -84,11 +107,15 @@ def main():
     parser.add_argument("-m", "--monitor-traffic", action="store_true", help="Monitor network traffic")
     parser.add_argument("-u", "--run-tests", action="store_true", help="Run unit tests for the firewall")
     parser.add_argument("-p", "--block-ports", type=str, help="Block traffic on specific ports (comma-separated, e.g., 22,80,443)")
+    parser.add_argument("-d", "--reset-rules", action="store_true", help="Delete all current rules")
 
     args = parser.parse_args()
+    if args.version:
+        print(f"{Fore.CYAN}Kavach Firewall v1.0.0{Style.RESET_ALL}")
+        return
     mode = "block" if args.start else "view" if args.view_live else None
 
-    packet_filter, logger, connection_tracker = initialize_firewall()
+    packet_filter, logger = initialize_firewall()
     if mode:
         packet_filter.mode = mode
 
@@ -172,6 +199,21 @@ def main():
 
     elif args.view_live:
         start_sniffer(packet_filter, logger)
+    
+    elif args.reset_rules:
+        packet_filter.rule_engine.rules = []
+        packet_filter.rule_engine.save_rules()
+        print(f"{Fore.YELLOW}⚠️ All firewall rules cleared.{Style.RESET_ALL}")
+        logger.log("All rules reset by user", level="WARNING")
+
+    elif args.list_rules:
+        rules = packet_filter.rule_engine.rules
+        if not rules:
+            print("🚫 No rules currently set.")
+        else:
+            print("\n📋 Current Firewall Rules:")
+            for rule in rules:
+                print(f"🔸 {rule}")
 
     elif args.block_ports:
         try:

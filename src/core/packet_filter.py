@@ -63,9 +63,19 @@ class PacketFilter:
         dst_col = Fore.LIGHTWHITE_EX
 
         # Determine action
-        is_allowed = self.rule_engine.check_packet(packet) == "ALLOW"
+        verdict = self.rule_engine.check_packet(packet)
+        is_allowed = verdict == "ALLOW"
         action = "ALLOW" if is_allowed else "BLOCK"
         action_color = Fore.GREEN if is_allowed else Fore.RED
+
+        if verdict == "BLOCK_RATE_LIMIT":
+            print(
+                f"{Fore.YELLOW}[⚠️] Rate limit exceeded for {packet[IP].src}. Blocking packet.{Style.RESET_ALL}"
+            )
+        if verdict == "BLOCK_RATE_LIMIT":
+            is_allowed = False
+            action = "BLOCK"
+            action_color = Fore.YELLOW
 
         # Only show:
         # → ALL traffic in 'view' mode (but BLOCK only if firewall is active)
