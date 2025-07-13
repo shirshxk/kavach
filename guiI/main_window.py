@@ -5,6 +5,8 @@ from PyQt5.QtGui import QFont
 from gui.rule_manager import RuleManager
 from gui.sniffer_view import SnifferView
 from gui.logs_viewer import LogsViewer
+from gui.firewall_toggle import FirewallToggle
+from gui.traffic_monitor import TrafficMonitor
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -20,10 +22,6 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         central_widget.setLayout(layout)
 
-        # Sidebar
-        self.sidebar = self.create_sidebar()
-        layout.addWidget(self.sidebar, 1)
-
         # Main display panel
         self.stack = QStackedLayout()
         main_panel = QWidget()
@@ -34,10 +32,18 @@ class MainWindow(QMainWindow):
         self.rule_manager_panel = RuleManager()
         self.sniffer_panel = SnifferView()
         self.logs_panel = LogsViewer()
+        self.firewall_panel = FirewallToggle()
+        self.traffic_panel = TrafficMonitor()
+
+        # Sidebar
+        self.sidebar = self.create_sidebar()
+        layout.addWidget(self.sidebar, 1)
 
         self.stack.addWidget(self.rule_manager_panel)
         self.stack.addWidget(self.sniffer_panel)
         self.stack.addWidget(self.logs_panel)
+        self.stack.addWidget(self.firewall_panel)
+        self.stack.addWidget(self.traffic_panel)
 
     def create_sidebar(self):
         sidebar = QWidget()
@@ -51,16 +57,18 @@ class MainWindow(QMainWindow):
         title.setStyleSheet("color: white; padding: 20px;")
         layout.addWidget(title)
 
-        btn_rule_manager = QPushButton("Manage Rules")
-        btn_rule_manager.clicked.connect(lambda: self.stack.setCurrentWidget(self.rule_manager_panel))
+        # Sidebar buttons
+        buttons = [
+            ("Manage Rules", self.rule_manager_panel),
+            ("Live Traffic", self.sniffer_panel),
+            ("View Logs", self.logs_panel),
+            ("Firewall Mode", self.firewall_panel),
+            ("Traffic Monitor", self.traffic_panel)
+        ]
 
-        btn_sniffer = QPushButton("Live Traffic")
-        btn_sniffer.clicked.connect(lambda: self.stack.setCurrentWidget(self.sniffer_panel))
-
-        btn_logs = QPushButton("View Logs")
-        btn_logs.clicked.connect(lambda: self.stack.setCurrentWidget(self.logs_panel))
-
-        for btn in [btn_rule_manager, btn_sniffer, btn_logs]:
+        for label, panel in buttons:
+            btn = QPushButton(label)
+            btn.clicked.connect(lambda checked, p=panel: self.stack.setCurrentWidget(p))
             btn.setStyleSheet("""
                 QPushButton {
                     background-color: #8B1A1A;
