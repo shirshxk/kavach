@@ -240,13 +240,16 @@ Example:
 
 ```
 firewall/
-├── cli/
-│   └── main.py
+├── main.py
 ├── gui/
 │   ├── gui_app.py
+│   ├── state.py
+│   ├── verdict_log.py
 │   └── unified_main.py
 ├── src/
 │   ├── core/
+│   │   ├── configs/
+│   │   │   └── default_rules.json
 │   │   ├── packet_sniffer.py
 │   │   ├── packet_filter.py
 │   │   ├── rule_engine.py
@@ -255,9 +258,9 @@ firewall/
 │       └── helpers.py
 ├── logs/
 │   └── firewall.log
-├── default_rules.json
 ├── tests/
 │   └── test_*.py
+├── logo.png
 └── requirements.txt
 ```
 
