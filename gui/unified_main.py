@@ -64,9 +64,7 @@ class UnifiedMain(QWidget):
         add_btn = QPushButton("Add Rule")
         remove_btn = QPushButton("Remove Rule")
         list_btn = QPushButton("List Rules")
-
-        for btn in [add_btn, remove_btn, list_btn]:
-            btn.setStyleSheet("background-color: #B22222; color: white; padding: 8px; border-radius: 6px;")
+        
 
         add_btn.clicked.connect(self.add_rule)
         remove_btn.clicked.connect(self.remove_rule)
@@ -116,7 +114,7 @@ class UnifiedMain(QWidget):
 
         # --- Styled Traffic Monitor Labels ---
         self.packet_count_label = self._create_monitor_box("Total Packets", "0", "#5A5A5A")
-        self.blocked_count_label = self._create_monitor_box("Total Blocked", "0", "#D32F2F")
+        self.blocked_count_label = self._create_monitor_box("Total Blocked", "0", "#D22222")
         self.allowed_count_label = self._create_monitor_box("Total Allowed", "0", "#43A047")
         self.monitor_container = QHBoxLayout()
         self.monitor_container.addWidget(self.packet_count_label)
@@ -136,7 +134,6 @@ class UnifiedMain(QWidget):
         self.output_box.setReadOnly(True)
         self.output_box.setStyleSheet("background-color: #1c1c1c; color: #EEEEEE; border-radius: 8px;")
         right_panel.addWidget(self.output_box)
-
         bottom_section.addLayout(right_panel, 2)
         layout.addLayout(bottom_section)
 
@@ -153,18 +150,33 @@ class UnifiedMain(QWidget):
         self.stop_btn.setEnabled(False)
         self.status_label = QLabel("Status: 🔴 INACTIVE")
         self.status_label.setFont(QFont("Bricolage Grotesque", 12, QFont.Bold))
+        red_button_style = """
+            QPushButton {
+                background-color: #B22222;
+                color: white;
+                padding: 8px;
+                border-radius: 6px;
+            }
+            QPushButton:hover {
+                background-color: #e53935;
+            }
+        """
+        for btn in [add_btn, remove_btn, list_btn, self.start_btn, self.stop_btn]:
+            btn.setStyleSheet(red_button_style)
 
         self.start_btn.clicked.connect(self.start_firewall)
         self.stop_btn.clicked.connect(self.stop_firewall)
 
-        for btn in [self.start_btn, self.stop_btn]:
-            btn.setStyleSheet("background-color: #cc3333; color: white; padding: 8px; border-radius: 6px;")
-
         fw_bar = QHBoxLayout()
         fw_bar.addWidget(self.start_btn)
         fw_bar.addWidget(self.stop_btn)
-        fw_bar.addWidget(self.status_label)
+        fw_bar.addStretch(1)
+        status_container = QHBoxLayout()
+        status_container.addStretch()
+        status_container.addWidget(self.status_label)
+        status_container.addStretch()
 
+        fw_bar.addLayout(status_container)
         layout.addLayout(fw_bar)
 
 
@@ -229,7 +241,7 @@ class UnifiedMain(QWidget):
 
         try:
             subprocess.run(["sudo", "iptables", "-I", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"], check=True)
-            self.status_label.setText("Status: 🟢 ACTIVE")
+            self.status_label.setText("Status: 🟢🔴 ACTIVE")
             self.start_btn.setEnabled(False)
             self.stop_btn.setEnabled(True)
             firewall_active = True
