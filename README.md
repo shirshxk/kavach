@@ -20,16 +20,15 @@ Kavach is a real-time packet filtering firewall written in Python using Scapy an
 
 ## RUNTIME ARCHITECTURE
 
-```mermaid
 graph TD
-    A[GUI Application (UnifiedMain)] --> B[RuleEngine]
+    A[GUI Application: UnifiedMain] --> B[RuleEngine]
     A --> C[PacketFilter]
     A --> D[NetfilterQueue Binding]
     D --> E[VerdictEmitter Signal]
-    E --> F[append_traffic_row (GUI Table + Stats)]
+    E --> F[append_traffic_row - GUI Table + Stats]
 
     B --> G[default_rules.json]
-    C --> H[Logger (firewall.log)]
+    C --> H[Logger - firewall.log]
 
     A --> I[Helper Functions]
     A --> J[PyQtGraph Live Monitor]
@@ -44,7 +43,7 @@ graph TD
     style H fill:#2a2a2a,color:white
     style I fill:#383838,color:white
     style J fill:#444,color:white
-```
+
 
 ---
 
