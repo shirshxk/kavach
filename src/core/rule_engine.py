@@ -2,9 +2,13 @@ import json
 from scapy.layers.inet import IP, TCP, UDP
 import time
 from collections import defaultdict, deque
+import os
 
 class RuleEngine:
-    def __init__(self, rules_file="src/core/configs/default_rules.json"):
+    def __init__(self, rules_file=None):
+        if rules_file is None:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+            rules_file = os.path.join(base_path, "configs", "default_rules.json")
         self.rules_file = rules_file
         self.rules = []  # Initialize rules as a list
         self.load_rules()

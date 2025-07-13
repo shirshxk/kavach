@@ -1,5 +1,6 @@
 import os
 import psutil
+import ipaddress 
 
 class Helper:
     @staticmethod
@@ -62,4 +63,22 @@ class Helper:
         if len(timestamps) > self.rate_limit_threshold:
             return True
         return False
+    
+    @staticmethod
+    def validate_ip_or_subnet_with_optional_port(ip_str, port_str=None):
+        # First validate IP or subnet
+        try:
+            ipaddress.ip_network(ip_str.strip(), strict=False)
+        except ValueError:
+            return False  # Invalid IP or subnet
+
+        # Now validate port(s) if provided
+        if port_str:
+            try:
+                Helper.parse_ports(port_str)
+            except Exception:
+                return False  # Invalid port(s)
+
+        return True
+
 
