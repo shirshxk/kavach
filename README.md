@@ -25,6 +25,80 @@ Kavach is a real-time packet filtering firewall written in Python using Scapy an
 
 ## RUNTIME ARCHITECTURE
 
+### CLI
+
+```mermaid
+graph TD
+    A[CLI Entry Point: main.py] --> B[ArgumentParser (CustomArgumentParser)]
+    B --> C1[Start Mode (-s)]
+    B --> C2[View Mode (-v)]
+    B --> C3[Add Rule (-a)]
+    B --> C4[Remove Rule (-r)]
+    B --> C5[List Rules (-l)]
+    B --> C6[Monitor Traffic (-m)]
+    B --> C7[Run Tests (-u)]
+    B --> C8[Version Info (-i)]
+    B --> C9[Reset Rules (-d)]
+
+    C1 --> D1[initialize_firewall()]
+    C2 --> D1
+    D1 --> E1[RuleEngine]
+    D1 --> E2[PacketFilter]
+    D1 --> E3[Logger]
+
+    C1 --> F[NetfilterQueue Binding]
+    F --> G[process_packet()]
+    G --> H[Scapy Packet Decoding]
+    G --> E2
+
+    C2 --> I[PacketSniffer]
+    I --> E2
+
+    C3 --> J1[Helper.parse_rule_arg()]
+    J1 --> E1
+    C4 --> J2[Helper.parse_rule_arg() or parse_ports()]
+    J2 --> E1
+    C5 --> E1
+
+    C6 --> K[Helper.detect_interface()]
+    K --> L[get_traffic_statistics()]
+    L --> M[psutil net_io_counters() + socket if_addrs()]
+
+    C7 --> N[test_firewall.py, test_logger.py, test_sniffer.py, etc.]
+
+    E1 --> O[default_rules.json]
+    E2 --> E3[Logger (firewall.log)]
+
+    style A fill:#222,color:white
+    style B fill:#333,color:white
+    style C1 fill:#444,color:white
+    style C2 fill:#444,color:white
+    style C3 fill:#444,color:white
+    style C4 fill:#444,color:white
+    style C5 fill:#444,color:white
+    style C6 fill:#444,color:white
+    style C7 fill:#444,color:white
+    style C8 fill:#444,color:white
+    style C9 fill:#444,color:white
+    style D1 fill:#2a2a2a,color:white
+    style E1 fill:#2d2d2d,color:white
+    style E2 fill:#2e2e2e,color:white
+    style E3 fill:#2f2f2f,color:white
+    style F fill:#555,color:white
+    style G fill:#666,color:white
+    style H fill:#777,color:white
+    style I fill:#666,color:white
+    style J1 fill:#3a3a3a,color:white
+    style J2 fill:#3a3a3a,color:white
+    style K fill:#383838,color:white
+    style L fill:#484848,color:white
+    style M fill:#585858,color:white
+    style N fill:#3c3c3c,color:white
+    style O fill:#2b2b2b,color:white
+```
+
+### GUI
+
 ```mermaid
 graph TD
     A[GUI Application: UnifiedMain] --> B[RuleEngine]
