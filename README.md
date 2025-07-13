@@ -1,6 +1,6 @@
 
-# KAVACH FIREWALL
-![KAVACH LOGO](https://github.com/shirshxk/kavach/blob/main/logo.png)
+# KAVACH 
+![KAVACH LOGO](https://github.com/shirshxk/kavach/blob/main/logofull.png)
 Kavach is a real-time packet filtering firewall written in Python using Scapy and NetfilterQueue. It provides both a command-line interface (CLI) and a modern graphical interface (GUI) built with PyQt5, allowing for dynamic rule management, live packet monitoring, and security logging.
 
 ---
