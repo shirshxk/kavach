@@ -26,6 +26,7 @@ Kavach is a real-time packet filtering firewall written in Python using Scapy an
 ## RUNTIME ARCHITECTURE
 
 ### CLI
+```mermaid
 ---
 config:
   layout: dagre
@@ -76,7 +77,7 @@ flowchart TD
     style M fill:#585858,color:white
     style N fill:#3c3c3c,color:white
     style O fill:#2b2b2b,color:white
-
+```
 
 ### GUI
 
