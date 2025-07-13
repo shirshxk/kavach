@@ -285,7 +285,6 @@ style J fill:#444,color:white
 ```bash
 
 git  clone  https://github.com/shirshxk/kavach
-
 cd  kavach
 
 ```
@@ -311,13 +310,9 @@ pip  install  -r  requirements.txt
 ```
 
 PyQt5
-
 pyqtgraph
-
 scapy
-
 netfilterqueue
-
 psutil
 
 ```
@@ -423,9 +418,7 @@ JSON rule structure:
 {
 
 "src": "192.168.1.0/24",
-
 "sport": 22,
-
 "action": "BLOCK"
 
 }
@@ -435,9 +428,7 @@ JSON rule structure:
   
 
 -  `src`: IP or subnet (CIDR supported)
-
 -  `sport`: Source port (optional)
-
 -  `action`: ALLOW or BLOCK
 
   
@@ -469,7 +460,6 @@ Example:
 ```
 
 [2025-07-13 13:45:02] BLOCK 192.168.1.10:443 -> 10.0.0.1:80 TCP
-
 [2025-07-13 13:45:06] ALLOW 192.168.1.11:1234 -> 10.0.0.1:22 UDP
 
 ```
@@ -487,43 +477,24 @@ Example:
 ```
 
 firewall/
-
 ├── cli/
-
 │ └── main.py
-
 ├── gui/
-
 │ ├── gui_app.py
-
 │ └── unified_main.py
-
 ├── src/
-
 │ ├── core/
-
 │ │ ├── packet_sniffer.py
-
 │ │ ├── packet_filter.py
-
 │ │ ├── rule_engine.py
-
 │ │ └── logger.py
-
 │ └── utils/
-
 │ └── helpers.py
-
 ├── logs/
-
 │ └── firewall.log
-
 ├── default_rules.json
-
 ├── tests/
-
 │ └── test_*.py
-
 └── requirements.txt
 
 ```
@@ -545,14 +516,10 @@ The GUI overrides `closeEvent()`:
 ```python
 
 def  closeEvent(self, event):
-
-if  hasattr(self, 'nfqueue'):
-
-self.nfqueue.unbind()
-
-subprocess.call(["sudo", "iptables", "-D", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"])
-
-event.accept()
+    if hasattr(self, 'nfqueue'):
+    self.nfqueue.unbind()
+    subprocess.call(["sudo", "iptables", "-D", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"])
+    event.accept()
 
 ```
 
