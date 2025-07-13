@@ -5,6 +5,11 @@ Kavach is a real-time packet filtering firewall written in Python using Scapy an
 
 ---
 
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![License](https://img.shields.io/badge/License-Educational-lightgrey)
+![Platform](https://img.shields.io/badge/Platform-Linux-orange)
+
+
 ## OVERVIEW
 
 - Real-time firewall that hooks into Linux iptables using NetfilterQueue
@@ -44,8 +49,7 @@ graph TD
     style H fill:#2a2a2a,color:white
     style I fill:#383838,color:white
     style J fill:#444,color:white
-    
----
+
 ## FEATURES
 
 ### CORE
