@@ -290,7 +290,7 @@ This project is licensed for educational and research purposes only, developed u
 
 ## CREDITS
 
-Developed by Shirshak Shrestha for coursework submission — July 2025
+Developed by Shirshak Shrestha for coursework submission, July 2025
 
 Course: Programming & Algorithm 2  
 Module Code: ST5062CEM  
