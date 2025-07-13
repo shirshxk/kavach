@@ -22,6 +22,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import QFontDatabase
 from netfilterqueue import NetfilterQueue
 import subprocess
+import pyqtgraph as pg
+
 
 class UnifiedMain(QWidget):
     def __init__(self):
@@ -122,6 +124,22 @@ class UnifiedMain(QWidget):
         self.monitor_container.addWidget(self.allowed_count_label)
 
         right_panel.addLayout(self.monitor_container)
+
+        self.graph_widget = pg.PlotWidget()
+        self.graph_widget.setBackground('#1e1e1e')
+        self.graph_widget.setTitle("Packet Verdicts Over Time", color='w', size='10pt')
+        self.graph_widget.setLabel('left', 'Packets')
+        self.graph_widget.setLabel('bottom', 'Time')
+
+        self.graph_allowed_curve = self.graph_widget.plot(pen=pg.mkPen(color='#43A047', width=2))
+        self.graph_blocked_curve = self.graph_widget.plot(pen=pg.mkPen(color='#D22222', width=2))
+
+        self.time_series = []
+        self.allowed_series = []
+        self.blocked_series = []
+
+        right_panel.addWidget(self.graph_widget)
+
 
         self.logs_btn.clicked.connect(self.show_logs)
         self.clear_btn.clicked.connect(self.clear_output)
@@ -318,6 +336,15 @@ class UnifiedMain(QWidget):
     
     def clear_output(self):
         self.output_box.clear()
+    def closeEvent(self, event):
+        try:
+            if hasattr(self, 'nfqueue'):
+                self.nfqueue.unbind()
+            subprocess.call(["sudo", "iptables", "-D", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"])
+            print("Firewall cleaned up on exit.")
+        except Exception as e:
+            print(f"[Cleanup Error] {e}")
+        event.accept() 
 
     @pyqtSlot(dict)
     def append_traffic_row(self, data):
@@ -333,6 +360,20 @@ class UnifiedMain(QWidget):
         self.packet_count_label.count_label.setText(str(self.total_packets))
         self.blocked_count_label.count_label.setText(str(self.total_blocked))
         self.allowed_count_label.count_label.setText(str(self.total_allowed))
+
+        from time import time, strftime, localtime
+        self.time_series.append(strftime("%H:%M:%S", localtime()))
+        self.allowed_series.append(self.total_allowed)
+        self.blocked_series.append(self.total_blocked)
+
+        self.graph_allowed_curve.setData(list(range(len(self.allowed_series))), self.allowed_series)
+        self.graph_blocked_curve.setData(list(range(len(self.blocked_series))), self.blocked_series)
+
+        MAX_POINTS = 100
+        if len(self.time_series) > MAX_POINTS:
+            self.time_series.pop(0)
+            self.allowed_series.pop(0)
+            self.blocked_series.pop(0)
 
         self.packet_table.setItem(row, 0, QTableWidgetItem(data["time"]))
         self.packet_table.setItem(row, 1, QTableWidgetItem(data["proto"]))
