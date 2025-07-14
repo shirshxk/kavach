@@ -685,3 +685,5 @@
 2025-07-13 13:41:30,404 - INFO - Firewall initialized
 2025-07-13 13:41:30,405 - INFO - Rule added: {'src': '8.8.8.8', 'action': 'BLOCK'}
 2025-07-13 13:41:38,548 - INFO - Firewall initialized
+2025-07-14 11:18:49,501 - INFO - Firewall initialized
+2025-07-14 11:19:01,222 - INFO - Firewall initialized
