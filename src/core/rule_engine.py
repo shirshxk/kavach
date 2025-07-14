@@ -26,8 +26,6 @@ class RuleEngine:
                     self.rules = data.get("rules", [])
                 elif isinstance(data, list):
                     self.rules = data  # If it's already a list, use it directly
-
-            print("Rules loaded successfully.")
         except FileNotFoundError:
             print("Rules file not found. Starting with no rules.")
         except json.JSONDecodeError:

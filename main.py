@@ -23,9 +23,9 @@ class CustomArgumentParser(argparse.ArgumentParser):
 
     def print_help(self):
         print(f"""
-    {Fore.CYAN + Style.BRIGHT}Kavach Firewall CLI{Style.RESET_ALL}
+    {Fore.CYAN + Style.BRIGHT}Kavach CLI{Style.RESET_ALL}
     {Fore.WHITE}Usage:{Style.RESET_ALL}
-    sudo ./main.py [option] [value]
+    kavach [option] [value]
 
     {Fore.GREEN}Available Commands:{Style.RESET_ALL}
     {Fore.YELLOW}-s{Style.RESET_ALL}                Start the firewall (block mode)
@@ -64,7 +64,6 @@ def cleanup_iptables():
     subprocess.call(["iptables", "-D", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"])
 
 def initialize_firewall():
-    print("Initializing Firewall...")
     logger = Logger("logs/firewall.log")
     logger.log("Firewall initialized", level="INFO")
 
@@ -245,7 +244,6 @@ def main():
             print("📝 Correct Format: -p 22,80,443")
 
     else:
-        print("\n[⚙️] No option provided. Use --help to see available commands.\n")
         parser.print_help()
 
 if __name__ == "__main__":

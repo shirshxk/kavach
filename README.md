@@ -135,20 +135,29 @@ graph TD
 
 ---
 
-## INSTALLATION
+## 🔧 Installation
+
+First, clone the repository and navigate into the project directory:
 
 ```bash
-git clone https://github.com/shirshxk/kavach
+git clone https://github.com/shirshxk/kavach.git
 cd kavach
 ```
 
-Install dependencies:
+Then, run the setup script to automatically install all required dependencies and configure CLI aliases:
 
 ```bash
-pip install -r requirements.txt
+sudo python3 setup.py
 ```
 
-`requirements.txt`:
+> This script installs packages listed in `requirements.txt` and creates convenient aliases:  
+> `kavach` for the CLI tool and `kavachgui` for the GUI version.
+
+If the aliases do not take effect immediately, restart your terminal or run `source ~/.bashrc` (or `~/.zshrc` depending on your shell).
+
+## 📦 Dependencies
+
+These are installed automatically by the setup script, but for reference:
 
 ```
 PyQt5
@@ -156,50 +165,86 @@ pyqtgraph
 scapy
 netfilterqueue
 psutil
+colorama
+tqdm
 ```
 
----
+## 🚀 Usage
 
-## USAGE
+### GUI Mode
 
-### GUI
+```bash
+sudo kavachgui
+```
+
+Or if you want to run it manually:
 
 ```bash
 cd gui
-sudo python3 gui_app.py
+sudo ./gui_app.py
 ```
 
-### CLI
+### CLI Mode
+
+Start the firewall:
 
 ```bash
-sudo python3 main.py --start
+sudo kavach --start
 ```
 
-To add rule:
+View traffic live (no blocking):
 
 ```bash
-python3 main.py -a "192.168.1.5,ALLOW"
+sudo kavach --view-live
 ```
 
-To remove rule:
+Add a rule:
 
 ```bash
-python3 main.py -r "192.168.1.5,ALLOW"
+kavach -a "192.168.1.5,BLOCK"
 ```
 
-To list rules:
+Remove a rule:
 
 ```bash
-python3 main.py -l
+kavach -r "192.168.1.5,BLOCK"
 ```
 
-To stop firewall:
+List all rules:
 
 ```bash
-python3 main.py --stop
+kavach -l
 ```
 
----
+Block ports:
+
+```bash
+kavach -p "22,80,443"
+```
+
+Monitor traffic for 10 seconds (default):
+
+```bash
+kavach -m
+```
+
+Reset all rules:
+
+```bash
+kavach -d
+```
+
+Run unit tests:
+
+```bash
+kavach -u
+```
+
+Check version:
+
+```bash
+kavach -i
+```
 
 ## RULE FORMAT
 
@@ -241,6 +286,7 @@ Example:
 ```
 firewall/
 ├── main.py
+├── setup.py
 ├── gui/
 │   ├── gui_app.py
 │   ├── state.py
