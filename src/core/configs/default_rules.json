@@ -1,8 +1,8 @@
 {
     "rules": [
         {
-            "src": "8.8.8.8",
-            "action": "BLOCK"
+            "action": "BLOCK",
+            "sport": 22
         }
     ]
 }

@@ -174,7 +174,7 @@ tqdm
 ### GUI Mode
 
 ```bash
-sudo kavachgui
+kavachgui
 ```
 
 Or if you want to run it manually:
@@ -189,13 +189,13 @@ sudo ./gui_app.py
 Start the firewall:
 
 ```bash
-sudo kavach --start
+kavach --start
 ```
 
 View traffic live (no blocking):
 
 ```bash
-sudo kavach --view-live
+kavach --view-live
 ```
 
 Add a rule:

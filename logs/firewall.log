@@ -696,3 +696,43 @@
 2025-07-14 22:43:22,102 - INFO - Firewall initialized
 2025-07-14 22:43:37,191 - INFO - Firewall initialized
 2025-07-14 22:43:53,782 - INFO - Firewall initialized
+2025-07-14 22:52:05,581 - INFO - Firewall initialized
+2025-07-14 22:52:25,252 - INFO - Firewall initialized
+2025-07-14 22:53:26,347 - INFO - Firewall initialized
+2025-07-14 22:53:26,347 - INFO - Rule added: {'src': '8.8.8.8', 'action': 'BLOCK'}
+2025-07-14 22:54:17,667 - INFO - Firewall initialized
+2025-07-14 23:02:03,643 - INFO - Firewall initialized
+2025-07-14 23:02:11,978 - INFO - Firewall initialized
+2025-07-14 23:02:11,979 - INFO - Port block rule added: {'port': 22, 'action': 'BLOCK'}
+2025-07-14 23:02:46,955 - INFO - Firewall initialized
+2025-07-14 23:02:56,538 - INFO - Firewall initialized
+2025-07-14 23:02:56,539 - INFO - Port block rule removed: {'port': 22, 'action': 'BLOCK'}
+2025-07-14 23:02:58,609 - INFO - Firewall initialized
+2025-07-14 23:03:08,003 - INFO - Firewall initialized
+2025-07-14 23:03:17,513 - INFO - Firewall initialized
+2025-07-14 23:03:17,514 - INFO - Port block rule added: {'port': 22, 'action': 'BLOCK'}
+2025-07-14 23:03:19,513 - INFO - Firewall initialized
+2025-07-14 23:03:25,555 - INFO - Firewall initialized
+2025-07-14 23:03:34,721 - INFO - Firewall initialized
+2025-07-14 23:03:34,721 - INFO - Port block rule removed: {'port': 22, 'action': 'BLOCK'}
+2025-07-14 23:03:37,929 - INFO - Firewall initialized
+2025-07-14 23:03:41,706 - INFO - Firewall initialized
+2025-07-14 23:03:50,834 - INFO - Firewall initialized
+2025-07-14 23:03:50,834 - INFO - Port block rule added: {'port': 22, 'action': 'BLOCK'}
+2025-07-14 23:03:53,350 - INFO - Firewall initialized
+2025-07-14 23:07:03,662 - INFO - Firewall initialized
+2025-07-14 23:07:03,662 - INFO - Port block rule added: {'port': 22, 'action': 'BLOCK'}
+2025-07-14 23:07:09,370 - INFO - Firewall initialized
+2025-07-14 23:07:57,576 - INFO - Firewall initialized
+2025-07-14 23:11:39,499 - INFO - Firewall initialized
+2025-07-14 23:17:08,224 - INFO - Firewall initialized
+2025-07-14 23:17:30,961 - INFO - Firewall initialized
+2025-07-14 23:17:43,391 - INFO - Firewall initialized
+2025-07-14 23:19:21,404 - INFO - Firewall initialized
+2025-07-14 23:19:40,262 - INFO - Firewall initialized
+2025-07-14 23:20:40,679 - INFO - Firewall initialized
+2025-07-14 23:22:06,210 - INFO - Firewall initialized
+2025-07-14 23:22:27,441 - INFO - Firewall initialized
+2025-07-14 23:22:30,939 - INFO - Firewall initialized
+2025-07-14 23:24:18,195 - INFO - Firewall initialized
+2025-07-14 23:26:07,430 - INFO - Firewall initialized

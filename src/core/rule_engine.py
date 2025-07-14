@@ -56,30 +56,29 @@ class RuleEngine:
         """
         Checks if the given packet matches any rule.
         Returns "BLOCK" if a rule matches and says to block,
-        otherwise returns "ALLOW".
+        or if rate limiting is triggered. Otherwise returns "ALLOW".
         """
-        if not self.rules:
-            return "ALLOW"
+        if IP in packet:
+            ip_layer = packet[IP]
+            src_ip = ip_layer.src
+
+            # ✅ Always apply rate limiting first
+            if self.is_rate_limited(src_ip):
+                return "BLOCK"
 
         for rule in self.rules:
-            # Check for IP layer
+            # IP match
             if IP in packet:
                 ip_layer = packet[IP]
-                src_ip = ip_layer.src
-
-                if self.is_rate_limited(src_ip):
-                    return "BLOCK"
                 if rule.get("src") and ip_layer.src != rule["src"]:
                     continue
                 if rule.get("dst") and ip_layer.dst != rule["dst"]:
                     continue
-
             else:
-                # If rule needs IP fields but packet has no IP layer, skip
                 if "src" in rule or "dst" in rule:
                     continue
 
-            # Check protocol
+            # Protocol match
             if rule.get("protocol"):
                 proto = rule["protocol"].lower()
                 if proto == "tcp" and not packet.haslayer(TCP):
@@ -89,10 +88,26 @@ class RuleEngine:
                 elif proto == "ip" and not packet.haslayer(IP):
                     continue
 
-            # If all checks pass, return action
+            # Port match
+            if TCP in packet or UDP in packet:
+                pkt_sport = packet[TCP].sport if TCP in packet else packet[UDP].sport
+                pkt_dport = packet[TCP].dport if TCP in packet else packet[UDP].dport
+
+                if "port" in rule:
+                    if pkt_sport != rule["port"] and pkt_dport != rule["port"]:
+                        continue
+
+                if "sport" in rule and pkt_sport != rule["sport"]:
+                    continue
+                if "dport" in rule and pkt_dport != rule["dport"]:
+                    continue
+
+            # All conditions matched
             return rule.get("action", "ALLOW").upper()
 
-        return "ALLOW"  # No rule matched means allow by default
+        # No rule matched
+        return "ALLOW"
+
 
     def is_rate_limited(self, src_ip):
         now = time.time()
