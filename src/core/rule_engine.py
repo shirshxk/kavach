@@ -33,6 +33,7 @@ class RuleEngine:
 
     def save_rules(self):
         try:
+            os.makedirs(os.path.dirname(self.rules_file), exist_ok=True)
             with open(self.rules_file, "w") as file:
                 json.dump({"rules": self.rules}, file, indent=4)  # Wrap the rules in a dictionary
             print(f"Rules saved to {self.rules_file}.")

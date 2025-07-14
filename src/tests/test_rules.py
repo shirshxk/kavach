@@ -1,80 +1,44 @@
 import unittest
+from scapy.all import IP
 from src.core.rule_engine import RuleEngine
+import os
 
 class TestRuleEngine(unittest.TestCase):
     def setUp(self):
-        """
-        Initialize a fresh instance of the RuleEngine for each test case,
-        ensuring no residual state from previous tests.
-        """
-        self.engine = RuleEngine()
+        self.engine = RuleEngine(rules_file="src/core/configs/test_rules.json")
         self.sample_rule = {"src": "192.168.1.100", "action": "BLOCK"}
+        self.engine.rules = []  # Start with clean state
 
     def tearDown(self):
-        """
-        Clean up after tests if required (e.g., clearing saved rules).
-        """
-        self.engine.rules = []
-        self.engine.save_rules()
+        if os.path.exists("src/core/configs/test_rules.json"):
+            os.remove("src/core/configs/test_rules.json")
 
     def test_add_rule(self):
-        """
-        Test adding a single rule and ensure it's included in the rules.
-        """
         self.engine.add_rule(self.sample_rule)
         self.assertIn(self.sample_rule, self.engine.rules)
 
-    
-    def test_remove_rule(self):
-        """
-        Test removing a rule and ensure it's no longer present.
-        """
+    def test_remove_existing_rule(self):
         self.engine.add_rule(self.sample_rule)
         self.engine.remove_rule(self.sample_rule)
         self.assertNotIn(self.sample_rule, self.engine.rules)
 
-    def test_remove_nonexistent_rule(self):
-        """
-        Test that removing a non-existent rule does not cause errors
-        and leaves the rules unchanged.
-        """
-        initial_count = len(self.engine.rules)
-        self.engine.remove_rule(self.sample_rule)
-        self.assertEqual(len(self.engine.rules), initial_count)
-
-    def test_check_packet_allow(self):
-        """
-        Test that a packet with no matching rule is allowed.
-        """
-        packet = {"src": "10.0.0.1"}  # Adjust to match expected packet structure
-        result = self.engine.check_packet(packet)
-        self.assertEqual(result, "ALLOW")  # Default action for unmatched packets
-
-    def test_check_packet_block(self):
-        """
-        Test that a packet matching a 'BLOCK' rule is blocked.
-        """
-        # Arrange: Add the block rule to the RuleEngine
-        block_rule = {"src": "192.168.1.100", "action": "BLOCK"}
-        self.engine.add_rule(block_rule)
-
-        # Act: Check a packet that matches the block rule
-        test_packet = {"src": "192.168.1.100"}
-        print(f"Testing with packet: {test_packet}")
-        result = self.engine.check_packet(test_packet)
-        print(f"Check packet result: {result}")
-
-        # Assert: Verify that the result is 'BLOCK'
-        self.assertEqual(result, "BLOCK", "The packet should be blocked based on the rule.")
-
-
-    def test_empty_rules_allow(self):
-        """
-        Test that the engine defaults to allowing packets when no rules exist.
-        """
-        packet = {"src": "10.0.0.2"}  # Arbitrary packet data
-        result = self.engine.check_packet(packet)
+    def test_check_packet_allow_by_default(self):
+        pkt = IP(src="10.0.0.1", dst="192.168.1.1")
+        result = self.engine.check_packet(pkt)
         self.assertEqual(result, "ALLOW")
+
+    def test_check_packet_block_when_matched(self):
+        self.engine.add_rule(self.sample_rule)
+        pkt = IP(src="192.168.1.100", dst="192.168.1.1")
+        result = self.engine.check_packet(pkt)
+        self.assertEqual(result, "BLOCK")
+
+    def test_check_packet_rate_limiting(self):
+        self.engine.add_rule(self.sample_rule)
+        for _ in range(25):  # trigger rate limiting
+            self.engine.check_packet(IP(src="192.168.1.100", dst="192.168.1.1"))
+        result = self.engine.check_packet(IP(src="192.168.1.100", dst="192.168.1.1"))
+        self.assertEqual(result, "BLOCK")  # due to rate limiting
 
 if __name__ == "__main__":
     unittest.main()

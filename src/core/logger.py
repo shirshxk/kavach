@@ -1,7 +1,8 @@
 import logging
-
+import os
 class Logger:
     def __init__(self, log_file="firewall.log"):
+        os.makedirs(os.path.dirname(log_file), exist_ok=True)
         self.logger = logging.getLogger("FirewallLogger")
         self.logger.setLevel(logging.INFO)
         file_handler = logging.FileHandler(log_file)

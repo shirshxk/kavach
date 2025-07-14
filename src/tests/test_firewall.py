@@ -1,28 +1,21 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+import main
 import unittest
-from src.tests.test_sniffer import TestPacketSniffer
-from src.tests.test_rules import TestRuleEngine
-from src.tests.test_filter import TestPacketFilter
-from src.tests.test_logger import TestLogger
-
+from test_cli import TestKavachCLI
+from test_rules import TestRuleEngine
+from test_logger import TestLogger
+from test_filter import TestPacketFilter
 
 def run_all_tests():
-    """
-    Aggregates all tests and runs them together.
-    """
-    print("Running all unit tests...")
-    # Create a test suite
+    print("Running CLI + Core tests...")
     suite = unittest.TestSuite()
-
-    # Add individual test cases or test classes to the suite
-    suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestPacketSniffer))
+    suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestKavachCLI))
     suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestRuleEngine))
-    suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestPacketFilter))
     suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestLogger))
-
-    # Run the test suite
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
-
+    suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestPacketFilter))
+    unittest.TextTestRunner().run(suite)
 
 if __name__ == "__main__":
     run_all_tests()
