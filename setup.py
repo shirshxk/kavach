@@ -6,6 +6,15 @@ import subprocess
 import sys
 from pathlib import Path
 
+def check_system_dependencies():
+    print("🔍 Checking for system-level dependencies...")
+    result = subprocess.run(['dpkg', '-s', 'libnetfilter-queue-dev'], stdout=subprocess.DEVNULL)
+    if result.returncode != 0:
+        print("\n❗ 'libnetfilter-queue-dev' is not installed.")
+        print("👉 Please install it manually using:")
+        print("   sudo apt update && sudo apt install libnetfilter-queue-dev -y\n")
+        sys.exit("⛔ Cannot proceed until system dependency is resolved.")
+
 def make_executable(filepath):
     """Make a Python file executable."""
     if not os.path.exists(filepath):
@@ -56,6 +65,7 @@ def main():
         sys.exit(1)
 
     print("⚙️ Setting up Kavach Firewall...\n")
+    check_system_dependencies()
     make_executable(cli_path)
     make_executable(gui_path)
     install_requirements()

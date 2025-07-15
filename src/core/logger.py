@@ -18,7 +18,6 @@ class Logger:
         elif level == "ERROR":
             self.logger.error(message)
 
-# Example usage
 if __name__ == "__main__":
     logger = Logger()
     logger.log("Firewall started", level="INFO")

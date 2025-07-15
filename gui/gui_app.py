@@ -7,7 +7,6 @@ import os
 if "XDG_RUNTIME_DIR" not in os.environ:
     os.environ["XDG_RUNTIME_DIR"] = f"/tmp/runtime-{os.getuid()}"
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setFont(QFont("Bricolage Grotesque", 10))

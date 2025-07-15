@@ -1,5 +1,0 @@
-psutil
-pytest
-pyyaml
-requests
-scapy

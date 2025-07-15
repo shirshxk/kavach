@@ -1,4 +1,3 @@
-# src/utils/ip_utils.py
 import ipaddress
 
 class IpUtils:

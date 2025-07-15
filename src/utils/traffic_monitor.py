@@ -1,4 +1,3 @@
-# src/utils/traffic_monitor.py
 import time
 from scapy.all import sniff
 from .helpers import Helper
@@ -18,7 +17,6 @@ class TrafficMonitor:
         """Starts monitoring traffic for a specific duration."""
         sniff(iface=self.interface, prn=self.packet_handler, timeout=duration)
 
-# Function to integrate Traffic Monitor with the main program
 def get_traffic_statistics(interface=None, duration=10):
     if interface is None:
         interface = Helper.detect_interface()

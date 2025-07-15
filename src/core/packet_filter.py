@@ -12,10 +12,6 @@ class PacketFilter:
         self.printed_header = False  # flag to only print once
 
     def filter_packet(self, packet):
-        from scapy.all import IP, TCP, UDP, ARP
-        from datetime import datetime
-        from colorama import Fore, Style
-
         # silently ignore packets we don't know how to handle
         if not (IP in packet or ARP in packet):
             return True
@@ -77,9 +73,7 @@ class PacketFilter:
             action = "BLOCK"
             action_color = Fore.YELLOW
 
-        # Only show:
-        # → ALL traffic in 'view' mode (but BLOCK only if firewall is active)
-        # → ONLY blocked traffic in 'block' mode
+
         if self.mode == "view":
             # Check if iptables is actually running
             ipt_running = self._check_nfqueue()

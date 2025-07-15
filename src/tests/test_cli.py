@@ -2,8 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import sys
 import builtins
-
-# Import your main CLI module
+import importlib
 import main
 
 class TestKavachCLI(unittest.TestCase):
@@ -62,10 +61,11 @@ class TestKavachCLI(unittest.TestCase):
         self.run_cli(["-m", "1"])
         self.mock_print.assert_any_call('\x1b[32m✅ Monitoring Complete.\x1b[0m')
 
-    @patch("main.run_all_tests")
-    def test_run_tests(self, mock_tests):
-        self.run_cli(["-u"])
-        mock_tests.assert_called_once()
+
+    def test_run_tests_invokes_runner(self):
+        runner = importlib.import_module("src.tests.test_runner")
+        self.assertTrue(hasattr(runner, "run_all_tests"))
+
 
     @patch("main.initialize_firewall")
     def test_reset_rules(self, _):

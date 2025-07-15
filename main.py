@@ -10,7 +10,6 @@ from src.core.logger import Logger
 from src.utils.traffic_monitor import get_traffic_statistics
 from src.utils.helpers import Helper
 from src.utils.ip_utils import IpUtils
-from src.tests.test_firewall import run_all_tests
 from colorama import Fore, Style
 from tqdm import tqdm
 import time
@@ -208,10 +207,13 @@ def main():
         print(f"{Fore.MAGENTA}📊 Data Transferred   : {Fore.WHITE}{data:,} bytes{Style.RESET_ALL}")
         print()
 
-
     elif args.run_tests:
         print("Running unit tests...")
-        run_all_tests()
+        try:
+            from src.tests.test_runner import run_all_tests
+            run_all_tests()
+        except Exception as e:
+            print(f"[❌] Failed to run tests: {e}")
 
     elif args.view_live:
         start_sniffer(packet_filter, logger)
