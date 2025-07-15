@@ -312,22 +312,6 @@ firewall/
 
 ---
 
-## CLEAN EXIT STRATEGY
-
-The GUI overrides `closeEvent()`:
-
-```python
-def closeEvent(self, event):
-    if hasattr(self, 'nfqueue'):
-        self.nfqueue.unbind()
-    subprocess.call(["sudo", "iptables", "-D", "INPUT", "-j", "NFQUEUE", "--queue-num", "1"])
-    event.accept()
-```
-
-This ensures that iptables rule is removed and firewall no longer blocks packets on unexpected closure.
-
----
-
 ## LICENSE
 
 This project is licensed for educational and research purposes only, developed under the ST5062CEM Programming and Algorithm 2 module (Softwarica College).
