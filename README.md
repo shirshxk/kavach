@@ -24,7 +24,6 @@ Kavach is a real-time packet filtering firewall written in Python using Scapy an
 ### CLI & GUI
 ```mermaid
 flowchart TD
-    flowchart TD
     Start[User Launches CLI or GUI]
 
     %% Entry points
