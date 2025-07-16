@@ -21,6 +21,58 @@ Kavach is a real-time packet filtering firewall written in Python using Scapy an
 ---
 
 ## RUNTIME ARCHITECTURE
+### CLI & GUI
+```mermaid
+flowchart TD
+    Start[User Launches CLI or GUI]
+
+    %% Entry points
+    Start --> CLI[main.py (CLI Entry)]
+    Start --> GUI[gui_app.py (PyQt GUI Entry)]
+
+    %% CLI Route
+    CLI --> ArgParser[Parse CLI Arguments]
+    ArgParser -->|--start / --view-live| InitFirewall[Initialize Rule Engine + Packet Filter + Logger]
+    ArgParser -->|--start| NFQ[Set iptables → NFQUEUE]
+    NFQ --> PacketRoute[Bind NetfilterQueue → process_packet()]
+    PacketRoute --> PacketFilterCall[Check Packet with PacketFilter]
+    PacketFilterCall --> RuleEngine[Match Rules + Check Rate Limit]
+    RuleEngine --> Verdict[ALLOW / BLOCK]
+    Verdict --> Action[accept() or drop()]
+    Verdict --> Log[Log to File via Logger]
+
+    %% Traffic Monitor
+    ArgParser -->|--monitor-traffic| Monitor[get_traffic_statistics() from interface]
+    Monitor --> DisplayStats[Show packets + bytes sent/received]
+
+    %% CLI Rule Management
+    ArgParser -->|--add-rule| AddRule[Add rule to RuleEngine + Save JSON]
+    ArgParser -->|--remove-rule| RemoveRule[Remove rule from RuleEngine + Save]
+    ArgParser -->|--list-rules| ListRules[Print Rules from JSON]
+
+    %% CLI Exit or Exception
+    ArgParser -->|--run-tests| RunTests[Run Unit Tests from test_firewall.py]
+    ArgParser -->|--reset-rules| ResetRules[Clear all rule entries in RuleEngine]
+
+    %% GUI Route
+    GUI --> UnifiedMain[UnifiedMain Class (Qt UI)]
+    UnifiedMain --> GUIComponents[Traffic Table + Graph + Rule Panel]
+    UnifiedMain --> GUILogic[Add/Remove/List Rules through RuleEngine]
+    UnifiedMain --> GUIButtons[Start/Stop Firewall → bind NFQUEUE]
+    GUIButtons --> GUILoop[process(pkt) + filter_packet() + emit verdict]
+    GUILoop --> VerdictEmitter[verdict_emitter emits packet info]
+    VerdictEmitter --> GUIUpdate[Append verdicts to table + graph + counter]
+    GUIUpdate --> Log
+
+    %% Shared Blocks
+    InitFirewall --> RuleEngine
+    InitFirewall --> PacketFilter
+    InitFirewall --> Logger
+
+    %% Cleanup Paths
+    Action -->|KeyboardInterrupt| Cleanup[Remove NFQUEUE from iptables]
+    GUIButtons -->|Stop Clicked| Cleanup
+```
 
 ### CLI
 ```mermaid
