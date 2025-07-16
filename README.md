@@ -27,8 +27,8 @@ flowchart TD
     Start[User Launches CLI or GUI]
 
     %% Entry points
-    Start --> CLI[main.py (CLI Entry)]
-    Start --> GUI[gui_app.py (PyQt GUI Entry)]
+    Start --> CLI[CLI Entry: main.py]
+    Start --> GUI[GUI Entry: gui_app.py]
 
     %% CLI Route
     CLI --> ArgParser[Parse CLI Arguments]
