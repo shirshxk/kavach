@@ -24,44 +24,45 @@ Kavach is a real-time packet filtering firewall written in Python using Scapy an
 ### CLI & GUI
 ```mermaid
 flowchart TD
+    flowchart TD
     Start[User Launches CLI or GUI]
 
     %% Entry points
-    Start --> CLI[CLI Entry: main.py]
-    Start --> GUI[GUI Entry: gui_app.py]
+    Start --> CLI[main.py - CLI Entry]
+    Start --> GUI[gui_app.py - PyQt GUI Entry]
 
     %% CLI Route
     CLI --> ArgParser[Parse CLI Arguments]
-    ArgParser -->|--start / --view-live| InitFirewall[Initialize Rule Engine + Packet Filter + Logger]
-    ArgParser -->|--start| NFQ[Set iptables → NFQUEUE]
-    NFQ --> PacketRoute[Bind NetfilterQueue → process_packet()]
-    PacketRoute --> PacketFilterCall[Check Packet with PacketFilter]
-    PacketFilterCall --> RuleEngine[Match Rules + Check Rate Limit]
-    RuleEngine --> Verdict[ALLOW / BLOCK]
-    Verdict --> Action[accept() or drop()]
-    Verdict --> Log[Log to File via Logger]
+    ArgParser -->|--start / --view-live| InitFirewall[Initialize Rule Engine, Packet Filter, Logger]
+    ArgParser -->|--start| NFQ[Set iptables to NFQUEUE]
+    NFQ --> PacketRoute[Bind NetfilterQueue and process packet]
+    PacketRoute --> PacketFilterCall[Check packet using PacketFilter]
+    PacketFilterCall --> RuleEngine[Match rules and apply rate limit]
+    RuleEngine --> Verdict[ALLOW or BLOCK verdict]
+    Verdict --> Action[Accept or Drop the packet]
+    Verdict --> Log[Write action to log file]
 
     %% Traffic Monitor
-    ArgParser -->|--monitor-traffic| Monitor[get_traffic_statistics() from interface]
-    Monitor --> DisplayStats[Show packets + bytes sent/received]
+    ArgParser -->|--monitor-traffic| Monitor[Call get_traffic_statistics function]
+    Monitor --> DisplayStats[Display packet and byte stats]
 
     %% CLI Rule Management
-    ArgParser -->|--add-rule| AddRule[Add rule to RuleEngine + Save JSON]
-    ArgParser -->|--remove-rule| RemoveRule[Remove rule from RuleEngine + Save]
-    ArgParser -->|--list-rules| ListRules[Print Rules from JSON]
+    ArgParser -->|--add-rule| AddRule[Add rule to RuleEngine and save JSON]
+    ArgParser -->|--remove-rule| RemoveRule[Remove rule from RuleEngine]
+    ArgParser -->|--list-rules| ListRules[List rules from file]
 
     %% CLI Exit or Exception
-    ArgParser -->|--run-tests| RunTests[Run Unit Tests from test_firewall.py]
-    ArgParser -->|--reset-rules| ResetRules[Clear all rule entries in RuleEngine]
+    ArgParser -->|--run-tests| RunTests[Run all unit tests]
+    ArgParser -->|--reset-rules| ResetRules[Clear all rules in RuleEngine]
 
     %% GUI Route
-    GUI --> UnifiedMain[UnifiedMain Class (Qt UI)]
-    UnifiedMain --> GUIComponents[Traffic Table + Graph + Rule Panel]
-    UnifiedMain --> GUILogic[Add/Remove/List Rules through RuleEngine]
-    UnifiedMain --> GUIButtons[Start/Stop Firewall → bind NFQUEUE]
-    GUIButtons --> GUILoop[process(pkt) + filter_packet() + emit verdict]
-    GUILoop --> VerdictEmitter[verdict_emitter emits packet info]
-    VerdictEmitter --> GUIUpdate[Append verdicts to table + graph + counter]
+    GUI --> UnifiedMain[UnifiedMain class - Qt GUI]
+    UnifiedMain --> GUIComponents[UI: Table, Graph, Rule Panel]
+    UnifiedMain --> GUILogic[Rule Management Add/Remove/List]
+    UnifiedMain --> GUIButtons[Start or Stop Firewall with NFQUEUE]
+    GUIButtons --> GUILoop[Loop: process packet and filter it]
+    GUILoop --> VerdictEmitter[Emit verdict using verdict_emitter]
+    VerdictEmitter --> GUIUpdate[Update UI components]
     GUIUpdate --> Log
 
     %% Shared Blocks
@@ -70,8 +71,47 @@ flowchart TD
     InitFirewall --> Logger
 
     %% Cleanup Paths
-    Action -->|KeyboardInterrupt| Cleanup[Remove NFQUEUE from iptables]
+    Action -->|KeyboardInterrupt| Cleanup[Remove iptables NFQUEUE rule]
     GUIButtons -->|Stop Clicked| Cleanup
+
+    %% === Styling ===
+    style Start fill:#222,color:white
+
+    %% CLI Section
+    style CLI fill:#2e2e2e,color:white
+    style ArgParser fill:#3a3a3a,color:white
+    style InitFirewall fill:#444,color:white
+    style NFQ fill:#4b4b4b,color:white
+    style PacketRoute fill:#4b4b4b,color:white
+    style PacketFilterCall fill:#5a5a5a,color:white
+    style RuleEngine fill:#666,color:white
+    style Verdict fill:#777,color:white
+    style Action fill:#888,color:white
+    style Log fill:#999,color:white
+
+    style Monitor fill:#3a3a3a,color:white
+    style DisplayStats fill:#444,color:white
+
+    style AddRule fill:#3a3a3a,color:white
+    style RemoveRule fill:#3a3a3a,color:white
+    style ListRules fill:#3a3a3a,color:white
+    style RunTests fill:#3a3a3a,color:white
+    style ResetRules fill:#3a3a3a,color:white
+
+    %% GUI Section
+    style GUI fill:#2e2e2e,color:white
+    style UnifiedMain fill:#444,color:white
+    style GUIComponents fill:#4e4e4e,color:white
+    style GUILogic fill:#555,color:white
+    style GUIButtons fill:#5c5c5c,color:white
+    style GUILoop fill:#666,color:white
+    style VerdictEmitter fill:#777,color:white
+    style GUIUpdate fill:#888,color:white
+
+    %% Shared & Cleanup
+    style Cleanup fill:#aa0000,color:white
+    style InitFirewall fill:#444,color:white
+
 ```
 
 ### CLI
